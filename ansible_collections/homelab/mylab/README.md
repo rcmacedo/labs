@@ -16,7 +16,7 @@ This collection is designed for **lab, testing, and learning scenarios** where y
 ### From local tarball
 ```bash
 ansible-galaxy collection install homelab-mylab-1.0.0.tar.gz
-```bash
+
 ### From Git (development)
 # requirements.yml
 collections:
