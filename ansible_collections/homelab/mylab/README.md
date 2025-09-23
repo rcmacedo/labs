@@ -33,17 +33,18 @@ ansible-galaxy collection install -r requirements.yml
 ```
 ## Collection Layout
 
+```text
 playbooks/
-├── site.yml        # Main entrypoint  
-├── deployvms.yml   # VM provisioning  
-├── aap25.yml       # AAP deployment  
+├── site.yml           # Main entrypoint  
+├── deployvms.yml      # VM provisioning  
+├── aap25.yml          # AAP deployment  
 └── inventories/  
-    └── hosts.yml   # Example inventory  
+    └── hosts.yml      # Example inventory  
 
 roles/
-├── deploy_vms/     # Role to provision virtual machines  
-├── aap25_deploy/   # Role to install Ansible Automation Platform 2.5  
-
+├── deploy_vms/        # Role to provision virtual machines  
+├── aap25_deploy/      # Role to install Ansible Automation Platform 2.5  
+```
 
 ### Run only VM provisioning
 ```bash
