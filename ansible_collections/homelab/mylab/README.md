@@ -15,7 +15,7 @@ Installation
 ------------
 
 * From local tarball
-# ansible-galaxy collection install homelab-mylab-1.0.0.tar.gz
+ansible-galaxy collection install homelab-mylab-1.0.0.tar.gz
 
 * From Git (development)
 requirements.yml
