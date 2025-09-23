@@ -63,8 +63,8 @@ ansible-playbook homelab.mylab.playbooks.site.yml --tags aap25 -e target_env=aap
 
 ### Requirements
 
-Ansible >= 2.13
-Python >= 3.9
+Ansible >= 2.13  
+Python >= 3.9  
 SSH access to target hosts or virtualization environment
 
 Author
