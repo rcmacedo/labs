@@ -1,56 +1,68 @@
-# Ansible Collection - homelab.mylab
+# Ansible Collection: `homelab.mylab`
 
-Overview
---------
-The homelab.mylab Ansible Collection provides playbooks and roles to automate provisioning of a homelab environment.
-It includes tasks to:
+##  Overview
+The **`homelab.mylab`** Ansible Collection provides playbooks and roles to automate provisioning of a homelab environment.  
+It includes automation for:  
 
-* Provision and configure virtual machines
+- Provisioning and configuring virtual machines  
+- Deploying **Ansible Automation Platform 2.5 (AAP)**  
 
-* Deploy Ansible Automation Platform 2.5 (AAP)
+This collection is designed for **lab, testing, and learning scenarios** where you want a repeatable environment setup.
 
-This collection is designed for lab, testing, and learning scenarios where you want a repeatable environment setup
+---
 
-Installation
-------------
+## 📦 Installation
 
-* From local tarball
+### From local tarball
+```bash
 ansible-galaxy collection install homelab-mylab-1.0.0.tar.gz
 
-* From Git (development)
-requirements.yml
+### From Git (development)
+# requirements.yml
+collections:
+  - name: git+https://github.com/youruser/homelab-ansible.git#/ansible_collections/homelab/mylab
+    type: git
+    version: main
+
+### Install with:
 ansible-galaxy collection install -r requirements.yml
 
-* After installation, playbooks and roles will be available under:
+After installation, playbooks and roles will be available under:
 ~/.ansible/collections/ansible_collections/homelab/mylab/
 
-* Collection Layout
+Collection Layout
+
 playbooks/
   ├── site.yml         # Main entrypoint
   ├── deployvms.yml    # VM provisioning
   ├── aap25.yml        # AAP deployment
   └── inventories/
-      └── hosts.yml    # Dynamic inventory
+      └── hosts.yml    # Example inventory
 
 roles/
   ├── deploy_vms/      # Role to provision virtual machines
   ├── aap25_deploy/    # Role to install Ansible Automation Platform 2.5
 
-* USAGE
-
-* Run only VM provisioning
+### Run only VM provisioning
 ansible-playbook homelab.mylab.playbooks.site.yml --tags deployvms -e target_env=aap
 
-* Run only AAP deployment
+### Run only AAP deployment
 ansible-playbook homelab.mylab.playbooks.site.yml --tags aap25 -e target_env=aap
 
-* Requirements
+| Tag         | Description                              |
+| ----------- | ---------------------------------------- |
+| `deployvms` | Provision and configure virtual machines |
+| `aap25`     | Deploy Ansible Automation Platform 2.5   |
 
-# Ansible >= 2.13
-# Python >= 3.9
-# SSH access to target hosts or virtualization environment
 
-Dependencies defined in galaxy.yml (if any)
+### Requirements
 
-* Author
+Ansible >= 2.13
+Python >= 3.9
+SSH access to target hosts or virtualization environment
+
+Author
+
 Romulo Macedo (@rcmacedo)
+
+
