@@ -19,10 +19,10 @@ ansible-galaxy collection install homelab-mylab-1.0.0.tar.gz
 
 * From Git (development)
 requirements.yml
-# ansible-galaxy collection install -r requirements.yml
+ansible-galaxy collection install -r requirements.yml
 
 * After installation, playbooks and roles will be available under:
-# ~/.ansible/collections/ansible_collections/homelab/mylab/
+~/.ansible/collections/ansible_collections/homelab/mylab/
 
 * Collection Layout
 playbooks/
