@@ -17,7 +17,9 @@ This collection is designed for **lab, testing, and learning scenarios** where y
 ```bash
 ansible-galaxy collection install homelab-mylab-1.0.0.tar.gz
 
-### From Git (development)
+
+## From Git (development)
+```bash
 # requirements.yml
 collections:
   - name: git+https://github.com/youruser/homelab-ansible.git#/ansible_collections/homelab/mylab
@@ -25,12 +27,13 @@ collections:
     version: main
 
 ### Install with:
+```bash
 ansible-galaxy collection install -r requirements.yml
 
-After installation, playbooks and roles will be available under:
+## After installation, playbooks and roles will be available under:
 ~/.ansible/collections/ansible_collections/homelab/mylab/
-
-Collection Layout
+```
+## Collection Layout
 
 playbooks/
   ├── site.yml         # Main entrypoint
@@ -44,10 +47,13 @@ roles/
   ├── aap25_deploy/    # Role to install Ansible Automation Platform 2.5
 
 ### Run only VM provisioning
+```bash
 ansible-playbook homelab.mylab.playbooks.site.yml --tags deployvms -e target_env=aap
-
+```
 ### Run only AAP deployment
+```bash
 ansible-playbook homelab.mylab.playbooks.site.yml --tags aap25 -e target_env=aap
+```
 
 | Tag         | Description                              |
 | ----------- | ---------------------------------------- |
