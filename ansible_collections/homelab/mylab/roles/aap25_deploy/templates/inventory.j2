@@ -1,0 +1,44 @@
+# Fully dynamic AAP inventory
+
+{# Get unique groups dynamically from VM roles #}
+{% set groups = vms_all.aap | map(attribute='role') | unique %}
+
+{% for group in groups %}
+[{{ group }}]
+{% for h in vms_all.aap if h.role == group %}
+{{ h.name }}.{{ domain }}
+{% endfor %}
+
+{# Add special vars for automationcontroller #}
+{% if group == "automationcontroller" %}
+[automationcontroller:vars]
+peers=execution_nodes
+{% endif %}
+
+{% endfor %}
+
+[all:vars]
+ansible_user=root
+ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+
+registry_username=rcmacedo
+registry_password=01gh@Red01
+redis_mode=standalone
+
+{# Setting PostgreSQL host #}
+{% set db_host = vms_all.aap | selectattr('role','equalto','database') | first %}
+automationgateway_admin_password={{ aap_pasword }}
+automationgateway_pg_host={{ db_host.name }}.{{ domain }}
+automationgateway_pg_password={{ aap_pasword }}
+
+admin_password={{ aap_pasword }}
+pg_host={{ db_host.name }}.{{ domain }}
+pg_password={{ aap_pasword }}
+
+automationhub_admin_password={{ aap_pasword }}
+automationhub_pg_host={{ db_host.name }}.{{ domain }}
+automationhub_pg_password={{ aap_pasword }}
+
+automationedacontroller_admin_password={{ aap_pasword }}
+automationedacontroller_pg_host={{ db_host.name }}.{{ domain }}
+automationedacontroller_pg_password={{ aap_pasword }}

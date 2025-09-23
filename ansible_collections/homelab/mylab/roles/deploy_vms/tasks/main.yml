@@ -1,0 +1,74 @@
+---
+- name: Create VM disks if they don't exist
+  command: >
+    qemu-img create -f qcow2
+    -b {{ rhel9_image }}
+    -F qcow2
+    {{ vm_storage_path }}/{{ item.name }}.qcow2
+    {{ item.disk_size }}G
+  loop: "{{ vms }}"
+  args:
+    creates: "{{ vm_storage_path }}/{{ item.name }}.qcow2"
+
+- name: Generate SSH key pair for root user on localhost
+  community.crypto.openssh_keypair:
+    path: ~/.ssh/id_rsa
+    type: rsa
+    size: 4096
+    state: present
+    force: no
+
+- name: Copy SSH key pair
+  ansible.builtin.copy:
+    src: ~/.ssh/id_rsa.pub
+    dest: /tmp/id_rsa.pub
+    force: yes
+
+- name: Render interface config for each VM
+  template:
+    src: ifcfg-eth0.j2
+    dest: "/tmp/ifcfg-{{ item.name }}"
+  loop: "{{ vms }}"
+
+- name: Copy Satellite register call to each VM
+  ansible.builtin.copy:
+    src: register-satellite.sh
+    dest: "/tmp/register-satellite.sh"
+
+- name: Render hosts file for all VMs
+  template:
+    src: hosts.j2
+    dest: "/tmp/hosts"
+
+- name: Customize VM images (root password, hostname, static IP)
+  command: >
+    virt-customize -a {{ vm_storage_path }}/{{ item.name }}.qcow2
+    --root-password password:{{ root_password }}
+    --hostname {{ item.name }}.{{ domain }}
+    --ssh-inject root:file:/tmp/id_rsa.pub
+    --upload /tmp/ifcfg-{{ item.name }}:/etc/sysconfig/network-scripts/ifcfg-eth0
+    --upload /tmp/register-satellite.sh:/root/register-satellite.sh
+    --upload /tmp/hosts:/etc/hosts
+    --run-command "chmod +x /root/register-satellite.sh"
+    --run-command "sed -i 's/^#*PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config"
+    --run-command "sed -i 's/^#*PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config"
+    --run-command "systemctl enable sshd"
+  loop: "{{ vms }}"
+  become: yes
+
+- name: Create VM using virt-install if it does not exist
+  command: >
+    virt-install
+    --name {{ item.name }}
+    --ram {{ item.mem }}
+    --vcpus {{ item.vcpu }}
+    --disk path={{ vm_storage_path }}/{{ item.name }}.qcow2,format=qcow2
+    --os-variant rhel9.0
+    --network network={{ network_name }},model=virtio
+    --graphics vnc
+    --import
+    --noautoconsole
+  loop: "{{ vms }}"
+  loop_control:
+    loop_var: item
+  become: yes

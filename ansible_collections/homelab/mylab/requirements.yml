@@ -1,0 +1,5 @@
+# requirements.yml
+collections:
+  - name: git+https://github.com/rcmacedo/labs.git#/ansible_collections/homelab/mylab
+    type: git
+    version: main

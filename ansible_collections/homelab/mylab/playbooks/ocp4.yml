@@ -1,0 +1,7 @@
+---
+- name: "Deploy Openshift 4.19"
+  hosts: localhost
+  gather_facts: false
+  become: yes
+  roles:
+    - homelab.mylab.ocp4_deploy

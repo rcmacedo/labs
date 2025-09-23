@@ -1,0 +1,16 @@
+---
+# Provision step
+- import_playbook: deployvms.yml
+  tags:
+    - deployvms
+
+# AAP 2.5 deployment
+- import_playbook: aap25.yml
+  tags:
+    - aap25
+
+# OpenShift 4 deployment
+- import_playbook: ocp4.yml
+  tags:
+    - ocp4
+

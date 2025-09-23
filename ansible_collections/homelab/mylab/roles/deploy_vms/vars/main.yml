@@ -1,0 +1,38 @@
+#SPDX-License-Identifier: MIT-0
+---
+# vars file for deploy_vms
+# Path to the base qcow2 image (must exist already)
+rhel9_image: "/home/rmacedo/isos/rhel-9.5-x86_64-kvm.qcow2"
+
+# Directory where VM disks will be created
+#vm_storage_path: ""
+
+# User key file to connect passwordless ssh
+#ssh_key_file:
+#
+root_password: "redhat"
+domain: lab.example
+dns_server: "192.168.124.1"
+network_gateway: "192.168.124.1"
+network_name: external
+satellite_name: satellite
+satellite_ip: 192.168.124.253
+aap_pasword: redhat
+
+vms_all:
+  aap:
+    - { name: "aapgateway", role: "automationgateway", ip: "192.168.124.101", vcpu: 2, mem: 8192, disk_size: 20 }
+    - { name: "aapcontroller", role: "automationcontroller", ip: "192.168.124.102", vcpu: 2, mem: 8192, disk_size: 20 }
+    - { name: "aapexec", role: "execution_nodes", ip: "192.168.124.103", vcpu: 2, mem: 8192, disk_size: 20 }
+    - { name: "aapdb", role: "database", ip: "192.168.124.104", vcpu: 2, mem: 8192, disk_size: 20 }
+    - { name: "aapeda", role: "automationedacontroller", ip: "192.168.124.105", vcpu: 2, mem: 8192, disk_size: 20 }
+    - { name: "aaphub", role: "automationhub", ip: "192.168.124.106", vcpu: 2, mem: 8192, disk_size: 20 }
+
+  ocp:
+    - { name: "master1", ip: "192.168.124.201", vcpu: 2, mem: 8192, disk_size: 20 }
+    - { name: "master2", ip: "192.168.124.202", vcpu: 2, mem: 8192, disk_size: 20 }
+    - { name: "master3", ip: "192.168.124.203", vcpu: 2, mem: 8192, disk_size: 20 }
+    - { name: "worker1", ip: "192.168.124.204", vcpu: 4, mem: 12288, disk_size: 20 }
+    - { name: "worker2", ip: "192.168.124.205", vcpu: 4, mem: 12288, disk_size: 20 }
+    - { name: "worker3", ip: "192.168.124.206", vcpu: 4, mem: 12288, disk_size: 20 }
+

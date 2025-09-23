@@ -1,0 +1,4 @@
+- name: Wait until VM SSH is ready
+  ansible.builtin.wait_for_connection:
+    delay: 25
+    timeout: 60

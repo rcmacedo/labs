@@ -1,0 +1,34 @@
+---
+- name: Extract AAP 2.5 setup tarball
+  ansible.builtin.unarchive:
+    src: files/ansible-automation-platform-setup-2.5-17.tar.gz
+    dest: /opt
+    remote_src: no
+    mode: '0755'
+
+- name: Generate dynamic AAP inventory
+  ansible.builtin.template:
+    src: inventory.j2
+    dest: /opt/ansible-automation-platform-setup-2.5-17/inventory
+    mode: '0644'
+
+#- name: "Configure inventory for AAP 2.5"
+#  ansible.builtin.copy:
+#    src: files/inventory
+#    dest: /opt/ansible-automation-platform-setup-2.5-17
+
+- name: Installing AAP 2.5
+  ansible.builtin.shell: |
+    /opt/ansible-automation-platform-setup-2.5-17/setup.sh 
+  args:
+    chdir: /opt/ansible-automation-platform-setup-2.5-17
+    executable: /bin/bash
+  environment:
+    PYTHONUNBUFFERED: "1"
+    ANSIBLE_FORCE_COLOR: "True"
+  async: 3600
+  poll: 0
+
+- name: Monitoring the Installation Process
+  debug:
+    msg: TO MONITORING THE INSTALLATION PROCESS, RUN ->> tail -f /opt/ansible-automation-platform-setup-2.5-17/setup.log 

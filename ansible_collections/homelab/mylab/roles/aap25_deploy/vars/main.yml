@@ -1,0 +1,4 @@
+#SPDX-License-Identifier: MIT-0
+---
+# vars file for aap25_deploy
+ANSIBLE_FORCE_COLOR: "true"

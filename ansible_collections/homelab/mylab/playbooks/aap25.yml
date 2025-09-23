@@ -1,0 +1,8 @@
+---
+- name: "Deploy Ansible Automation Platform 2.5"
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - ../roles/deploy_vms/vars/main.yml
+  roles:
+    - homelab.mylab.aap25_deploy

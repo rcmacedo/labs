@@ -1,0 +1,53 @@
+---
+- name: Deploy lab VMs
+  hosts: localhost
+  gather_facts: false
+  become: yes
+
+  roles:
+    - role: deploy_vms
+      tags: deploy
+      when: "'deploy' in ansible_run_tags or ansible_run_tags|length == 0"
+  
+  tasks:
+    - name: Add each VM to dynamic inventory
+      ansible.builtin.add_host:
+        name: "{{ item.ip }}"
+        groups: vms
+        ansible_user: root
+        ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+      loop: "{{ vms }}"
+      loop_control:
+        loop_var: item
+      tags: always
+
+# ---------------------------------
+#
+- name: "Deploy Ansible Automation Platform 2.5"
+  hosts: vms
+  gather_facts: false
+  become: yes
+
+  tasks:
+    - block:
+        - name: Wait for VMs to be ready
+          import_tasks: deploy_vms/tasks/wait_for_vms.yml
+
+        - name: Run Ansible deployment tasks
+          import_tasks: deploy_vms/tasks/deploy_ansible_env.yml
+      tags: aap25
+
+# ---------------------------------
+- name: Deploy OpenShift environment on VMs
+  hosts: vms
+  gather_facts: false
+  become: yes
+
+  tasks:
+    - block:
+        - name: Wait for VMs to be ready
+          import_tasks: deploy_vms/tasks/wait_for_vms.yml
+
+        - name: Run OpenShift deployment tasks
+          import_tasks: deploy_vms/tasks/deploy_openshift_env.yml
+      tags: ocp4

@@ -1,0 +1,8 @@
+#### AAP NODES ##########################################
+192.168.124.101	aapgateway.lab.example aapgateway
+192.168.124.102	aapcontroller.lab.example aapcontroller
+192.168.124.103	aapexec.lab.example aapexec
+192.168.124.104	aapdb.lab.example aapdb
+192.168.124.105	aapeda.lab.example aapeda
+192.168.124.106	aaphub.lab.example aaphub
+#########################################################
