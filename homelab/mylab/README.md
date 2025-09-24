@@ -15,7 +15,7 @@ This collection is designed for **lab, testing, and learning scenarios** where y
 
 ```bash
 ### From local tarball
-ansible-galaxy collection install homelab-mylab-1.0.0.tar.gz
+ansible-galaxy collection install homelab-mylab-1.0.0.tar.gz -f
 
 
 ## From Git (development)
@@ -48,11 +48,11 @@ roles/
 
 ### Run only VM provisioning
 ```bash
-ansible-playbook homelab.mylab.playbooks.site.yml --tags deployvms -e target_env=aap
+ansible-playbook homelab.mylab.site.yml --tags deployvms -e target_env=aap
 ```
 ### Run only AAP deployment
 ```bash
-ansible-playbook homelab.mylab.playbooks.site.yml --tags aap25 -e target_env=aap
+ansible-playbook homelab.mylab.site.yml --tags deployvms,aap25 -e target_env=aap
 ```
 
 | Tag         | Description                              |
