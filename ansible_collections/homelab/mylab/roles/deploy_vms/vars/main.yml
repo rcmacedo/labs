@@ -5,18 +5,24 @@
 rhel9_image: "/home/rmacedo/isos/rhel-9.5-x86_64-kvm.qcow2"
 
 # Directory where VM disks will be created
-#vm_storage_path: ""
+vm_storage_path: "/var/lib/libvirt/images"
 
-# User key file to connect passwordless ssh
-#ssh_key_file:
-#
+# Vms root password
 root_password: "redhat"
+
+# Vms Domain
 domain: lab.example
+
+# Network variables
 dns_server: "192.168.124.1"
 network_gateway: "192.168.124.1"
 network_name: external
+
+# Satellite Access
 satellite_name: satellite
 satellite_ip: 192.168.124.253
+
+# AAP password
 aap_pasword: redhat
 
 vms_all:
@@ -35,4 +41,3 @@ vms_all:
     - { name: "worker1", ip: "192.168.124.204", vcpu: 4, mem: 12288, disk_size: 20 }
     - { name: "worker2", ip: "192.168.124.205", vcpu: 4, mem: 12288, disk_size: 20 }
     - { name: "worker3", ip: "192.168.124.206", vcpu: 4, mem: 12288, disk_size: 20 }
-

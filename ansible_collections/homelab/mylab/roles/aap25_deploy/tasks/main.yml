@@ -19,7 +19,7 @@
 
 - name: Installing AAP 2.5
   ansible.builtin.shell: |
-    /opt/ansible-automation-platform-setup-2.5-17/setup.sh 
+    /opt/ansible-automation-platform-setup-2.5-17/setup.sh
   args:
     chdir: /opt/ansible-automation-platform-setup-2.5-17
     executable: /bin/bash
