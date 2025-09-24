@@ -17,17 +17,6 @@ This collection is designed for **lab, testing, and learning scenarios** where y
 ### From local tarball
 ansible-galaxy collection install homelab-mylab-1.0.0.tar.gz -f
 
-
-## From Git (development)
-requirements.yml
-collections:
-  - name: git+https://github.com/rcmacedo/labs.git#/ansible_collections/homelab/mylab
-    type: git
-    version: main
-
-### Install with:
-ansible-galaxy collection install -r requirements.yml
-
 ## After installation, playbooks and roles will be available under:
 ~/.ansible/collections/ansible_collections/homelab/mylab/
 ```
