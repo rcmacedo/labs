@@ -12,11 +12,6 @@
     dest: /opt/ansible-automation-platform-setup-2.5-17/inventory
     mode: '0644'
 
-#- name: "Configure inventory for AAP 2.5"
-#  ansible.builtin.copy:
-#    src: files/inventory
-#    dest: /opt/ansible-automation-platform-setup-2.5-17
-
 - name: Installing AAP 2.5
   ansible.builtin.shell: |
     /opt/ansible-automation-platform-setup-2.5-17/setup.sh

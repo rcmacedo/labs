@@ -70,5 +70,3 @@ SSH access to target hosts or virtualization environment
 Author
 
 Romulo Macedo (@rcmacedo)
-
-
