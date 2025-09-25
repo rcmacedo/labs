@@ -52,11 +52,11 @@ Configure your /etc/hosts with servers that will be created
 
 ### Run only VM provisioning
 ```bash
-ansible-playbook homelab.mylab.site.yml --tags deployvms -e target_env=aap
+ansible-playbook homelab.mylab.site --tags deployvms -e target_env=aap --ask-become-pass
 ```
 ### Run only AAP deployment
 ```bash
-ansible-playbook homelab.mylab.site.yml --tags deployvms,aap25 -e target_env=aap
+ansible-playbook homelab.mylab.site --tags deployvms,aap25 -e target_env=aap --ask-become-pass
 ```
 
 | Tag         | Description                              |
