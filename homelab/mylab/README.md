@@ -54,7 +54,7 @@ Configure your /etc/hosts with servers that will be created
 ```bash
 ansible-playbook homelab.mylab.site --tags deployvms -e target_env=aap --ask-become-pass
 ```
-### Run only AAP deployment
+### Run VM's provisioning and AAP deployment
 ```bash
 ansible-playbook homelab.mylab.site --tags deployvms,aap25 -e target_env=aap --ask-become-pass
 ```
