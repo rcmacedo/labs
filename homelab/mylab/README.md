@@ -68,8 +68,7 @@ ansible-playbook homelab.mylab.site --tags deployvms,aap25 -e target_env=aap --a
 ### Requirements
 
 Ansible >= 2.13  
-Python >= 3.9  
-SSH access to target hosts or virtualization environment
+Python >= 3.9
 
 Author
 
