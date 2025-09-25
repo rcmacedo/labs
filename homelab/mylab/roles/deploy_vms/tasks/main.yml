@@ -9,14 +9,16 @@
   loop: "{{ vms }}"
   args:
     creates: "{{ vm_storage_path }}/{{ item.name }}.qcow2"
+  become: yes
 
-- name: Generate SSH key pair for root user on localhost
+- name: Generate SSH key pair for {{ ansible_user_id }} user on localhost
   community.crypto.openssh_keypair:
     path: ~/.ssh/id_rsa
     type: rsa
     size: 4096
     state: present
     force: no
+  become: no
 
 - name: Copy SSH key pair
   ansible.builtin.copy:

@@ -38,4 +38,3 @@
 
     - name: Registering ...
       ansible.builtin.shell: sh /root/register-satellite.sh
-      when: target_env == "aap"

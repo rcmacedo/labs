@@ -37,7 +37,7 @@ roles/
 
 ## Prerequisites
 ```text
-Red Hat Satellite Server available with the required subscription and the following repositories synchronized and made available in a content view.
+Red Hat Satellite Server available with the required subscription and the following repositories synchronized and made available in a content view. AAP Example.
 
 Red Hat Ansible Automation Platform 2.5 for RHEL 9 x86_64
 Red Hat Enterprise Linux 9 for x86_64 - AppStream (RPMs)
