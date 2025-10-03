@@ -5,7 +5,7 @@
     -b {{ rhel9_image }}
     -F qcow2
     {{ vm_storage_path }}/{{ item.0.name }}-{{ item.1.suffix }}.qcow2
-    {{ item.disk_size }}G
+    {{ item.1.size }}G
   loop: "{{ vms|subelements('disks') }}"
   args:
     creates: "{{ vm_storage_path }}/{{ item.0.name }}-{{ item.1.suffix }}.qcow2"
