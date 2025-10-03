@@ -4,11 +4,11 @@
     qemu-img create -f qcow2
     -b {{ rhel9_image }}
     -F qcow2
-    {{ vm_storage_path }}/{{ item.name }}.qcow2
+    {{ vm_storage_path }}/{{ item.0.name }}-{{ item.1.suffix }}.qcow2
     {{ item.disk_size }}G
-  loop: "{{ vms }}"
+  loop: "{{ vms|subelements('disks') }}"
   args:
-    creates: "{{ vm_storage_path }}/{{ item.name }}.qcow2"
+    creates: "{{ vm_storage_path }}/{{ item.0.name }}-{{ item.1.suffix }}.qcow2"
   become: yes
 
 - name: Generate SSH key pair for {{ ansible_user_id }} user on localhost
@@ -42,9 +42,9 @@
     src: hosts.j2
     dest: "/tmp/hosts"
 
-- name: Customize VM images (root password, hostname, static IP)
+- name: Customize VM images (root password, hostname, network, sshkey configs etc... )
   command: >
-    virt-customize -a {{ vm_storage_path }}/{{ item.name }}.qcow2
+    virt-customize -a {{ vm_storage_path }}/{{ item.name }}-root.qcow2
     --root-password password:{{ root_password }}
     --hostname {{ item.name }}.{{ domain }}
     --ssh-inject root:file:/tmp/id_rsa.pub
@@ -64,7 +64,9 @@
     --name {{ item.name }}
     --ram {{ item.mem }}
     --vcpus {{ item.vcpu }}
-    --disk path={{ vm_storage_path }}/{{ item.name }}.qcow2,format=qcow2
+    {% for disk in item.disks %}
+      --disk path={{ vm_storage_path }}/{{ item.name }}-{{ disk.suffix }}.qcow2,format=qcow2
+    {% endfor %}
     --os-variant rhel9.0
     --network network={{ network_name }},model=virtio
     --graphics vnc

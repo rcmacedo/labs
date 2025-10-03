@@ -27,13 +27,53 @@ aap_pasword: redhat
 
 vms_all:
   aap:
-    - { name: "aapgateway", role: "automationgateway", ip: "192.168.124.101", vcpu: 2, mem: 8192, disk_size: 20 }
-    - { name: "aapcontroller", role: "automationcontroller", ip: "192.168.124.102", vcpu: 2, mem: 8192, disk_size: 20 }
-    - { name: "aapexec", role: "execution_nodes", ip: "192.168.124.103", vcpu: 2, mem: 8192, disk_size: 20 }
-    - { name: "aapdb", role: "database", ip: "192.168.124.104", vcpu: 2, mem: 8192, disk_size: 20 }
-    - { name: "aapeda", role: "automationedacontroller", ip: "192.168.124.105", vcpu: 2, mem: 8192, disk_size: 20 }
-    - { name: "aaphub", role: "automationhub", ip: "192.168.124.106", vcpu: 2, mem: 8192, disk_size: 20 }
+    - name: "aapgateway"
+      role: "automationgateway"
+      ip: "192.168.124.101"
+      vcpu: 2
+      mem: 8192
+      disks:
+        - { size: 20, suffix: root }
 
+    - name: "aapcontroller"
+      role: "automationcontroller"
+      ip: "192.168.124.102"
+      vcpu: 2
+      mem: 8192
+      disks:
+        - { size: 20, suffix: root }
+
+    - name: "aapexec"
+      role: "execution_nodes"
+      ip: "192.168.124.103"
+      vcpu: 2
+      mem: 8192
+      disks:
+        - { size: 20, suffix: root }
+
+    - name: "aapdb"
+      role: "database"
+      ip: "192.168.124.104"
+      vcpu: 2
+      mem: 8192
+      disks:
+        - { size: 20, suffix: root }
+
+    - name: "aapeda"
+      role: "automationedacontroller"
+      ip: "192.168.124.105"
+      vcpu: 2
+      mem: 8192
+      disks:
+        - { size: 20, suffix: root }
+
+    - name: "aaphub"
+      role: "automationhub"
+      ip: "192.168.124.106"
+      vcpu: 2
+      mem: 8192
+      disks:
+        - { size: 20, suffix: root }
   ocp:
     - { name: "master1", ip: "192.168.124.201", vcpu: 2, mem: 8192, disk_size: 20 }
     - { name: "master2", ip: "192.168.124.202", vcpu: 2, mem: 8192, disk_size: 20 }
