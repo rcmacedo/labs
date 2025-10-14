@@ -32,11 +32,6 @@
     dest: "/tmp/ifcfg-{{ item.name }}"
   loop: "{{ vms }}"
 
-- name: Copy Satellite register call to each VM
-  ansible.builtin.copy:
-    src: register-satellite.sh
-    dest: "/tmp/register-satellite.sh"
-
 - name: Render hosts file for all VMs
   template:
     src: hosts.j2
@@ -49,9 +44,7 @@
     --hostname {{ item.name }}.{{ domain }}
     --ssh-inject root:file:/tmp/id_rsa.pub
     --upload /tmp/ifcfg-{{ item.name }}:/etc/sysconfig/network-scripts/ifcfg-eth0
-    --upload /tmp/register-satellite.sh:/root/register-satellite.sh
     --upload /tmp/hosts:/etc/hosts
-    --run-command "chmod +x /root/register-satellite.sh"
     --run-command "sed -i 's/^#*PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config"
     --run-command "sed -i 's/^#*PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config"
     --run-command "systemctl enable sshd"

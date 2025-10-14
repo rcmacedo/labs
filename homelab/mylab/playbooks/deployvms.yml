@@ -4,7 +4,6 @@
   gather_facts: false
   become: yes
   vars:
-    target_env: "{{ target_env }}" # use aap or ocp
     vms: "{{ vms_all[target_env] }}"
 
   roles:
@@ -52,4 +51,4 @@
           - rhel-9-for-x86_64-baseos-rpms
         state: enabled
       become: yes
-      when: target_env == aap
+      when: target_env == 'aap'

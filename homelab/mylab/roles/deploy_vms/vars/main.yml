@@ -18,14 +18,10 @@ dns_server: "192.168.124.1"
 network_gateway: "192.168.124.1"
 network_name: external
 
-# Satellite Access
-satellite_name: satellite
-satellite_ip: 192.168.124.253
-
 # AAP password
 aap_pasword: redhat
-registry_user: rcmacedo
-registry_pass: 01gh@Red01
+registry_user: 
+registry_pass: 
 
 vms_all:
   aap:
