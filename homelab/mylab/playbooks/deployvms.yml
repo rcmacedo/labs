@@ -22,7 +22,7 @@
       loop_control:
         loop_var: item
 
-- name: Registering hosts to Red Hat Satellite
+- name: Registering hosts to CDN
   hosts: vms
   gather_facts: false
   become: yes
@@ -36,5 +36,9 @@
         delay: 20
         timeout: 10
 
-    - name: Registering ...
-      ansible.builtin.shell: sh /root/register-satellite.sh
+    - name: Registering as user {{ registry_user }}.
+      community.general.redhat_subscription:
+        state: present
+        username: "{{ registry_user }}"
+        password: "{{ registry_pass }}"
+

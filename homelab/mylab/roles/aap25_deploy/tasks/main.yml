@@ -1,4 +1,14 @@
 ---
+
+- name: Enable repositories required by AAP 2.5 Installation
+  community.general.rhsm_repository:
+    name: 
+      - ansible-automation-platform-2.5-for-rhel-9-x86_64-rpms
+      - rhel-9-for-x86_64-appstream-rpms
+      - rhel-9-for-x86_64-baseos-rpms
+    state: enabled
+  become: yes
+
 - name: Extract AAP 2.5 setup tarball
   ansible.builtin.unarchive:
     src: files/ansible-automation-platform-setup-2.5-17.tar.gz
