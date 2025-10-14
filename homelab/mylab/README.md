@@ -24,7 +24,7 @@ ansible-galaxy collection install homelab-mylab-1.0.0.tar.gz -f
 
 ```text
 playbooks/
-├── site.yml           # Main entrypoint  
+├── site.yml           # Main entrypoint    
 ├── deployvms.yml      # VM provisioning  
 ├── aap25.yml          # AAP deployment  
 └── inventories/  
