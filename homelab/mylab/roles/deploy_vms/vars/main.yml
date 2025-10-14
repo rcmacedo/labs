@@ -24,8 +24,8 @@ satellite_ip: 192.168.124.253
 
 # AAP password
 aap_pasword: redhat
-registry_user:
-registry_pass:
+registry_user: rcmacedo
+registry_pass: 01gh@Red01
 
 vms_all:
   aap:

@@ -28,6 +28,8 @@
   become: yes
   vars:
     ansible_python_interpreter: /usr/bin/python3.9
+  vars_files:
+    - ../roles/deploy_vms/vars/main.yml
 
   tasks:
 
@@ -42,3 +44,12 @@
         username: "{{ registry_user }}"
         password: "{{ registry_pass }}"
 
+    - name: Enable repositories required by AAP 2.5 Installation
+      community.general.rhsm_repository:
+        name:
+          - ansible-automation-platform-2.5-for-rhel-9-x86_64-rpms
+          - rhel-9-for-x86_64-appstream-rpms
+          - rhel-9-for-x86_64-baseos-rpms
+        state: enabled
+      become: yes
+      when: target_env == aap
