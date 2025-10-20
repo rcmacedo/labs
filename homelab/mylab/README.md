@@ -14,7 +14,10 @@ This collection is designed for **lab, testing, and learning scenarios** where y
 ## 📦 Installation
 
 ```bash
-### From local tarball
+### Build the collection ###
+ansible-galaxy collection build -f
+
+### Install from local tarball
 ansible-galaxy collection install homelab-mylab-1.0.0.tar.gz -f
 
 ## After installation, playbooks and roles will be available under:
@@ -60,7 +63,7 @@ ansible-playbook homelab.mylab.site --tags deployvms,aap25 -e target_env=aap --a
 
 ### Requirements
 
-Ansible >= 2.13  
+ansible-ccore = 2.16
 Python >= 3.9
 
 Author
