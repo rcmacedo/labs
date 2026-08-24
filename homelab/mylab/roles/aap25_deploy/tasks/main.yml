@@ -30,5 +30,5 @@
   become: yes
 
 - name: Monitoring the Installation Process
-  debug:
+  ansible.builtin.debug:
     msg: TO MONITORING THE INSTALLATION PROCESS, RUN ->> sudo tail -f /opt/ansible-automation-platform-setup-2.5-17/setup.log

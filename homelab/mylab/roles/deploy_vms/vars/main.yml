@@ -1,8 +1,8 @@
-#SPDX-License-Identifier: MIT-0
+# SPDX-License-Identifier: MIT-0
 ---
 # vars file for deploy_vms
 # Path to the base qcow2 image (must exist already)
-rhel9_image: "/home/rmacedo/isos/rhel-9.5-x86_64-kvm.qcow2"
+rhel9_image: "/home/rmacedo/isos/rhel-9.8-x86_64-kvm.qcow2"
 
 # Directory where VM disks will be created
 vm_storage_path: "/var/lib/libvirt/images"
