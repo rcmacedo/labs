@@ -68,6 +68,7 @@
 - name: Monitor the installation process
   ansible.builtin.debug:
     msg: >-
-      AAP 2.7 installation started in background.
-      Monitor with: journalctl -f or check ansible-playbook job output.
-      Gateway URL after completion: https://{{ vms_all.aap | selectattr('role', 'equalto', 'automationgateway') | map(attribute='name') | first }}.{{ domain }}:443
+      TO MONITOR THE INSTALLATION PROCESS, RUN ->
+      tail -f {{ aap_setup_install_dir }}/aap_install.log
+      Gateway URL after completion:
+      https://{{ vms_all.aap | selectattr('role', 'equalto', 'automationgateway') | map(attribute='name') | first }}.{{ domain }}:443
