@@ -4,10 +4,10 @@
   tags:
     - deployvms
 
-# AAP 2.5 deployment
-- ansible.builtin.import_playbook: aap25.yml
+# AAP 2.7 deployment
+- ansible.builtin.import_playbook: aap27.yml
   tags:
-    - aap25
+    - aap27
 
 # OpenShift 4 deployment
 - ansible.builtin.import_playbook: ocp4.yml

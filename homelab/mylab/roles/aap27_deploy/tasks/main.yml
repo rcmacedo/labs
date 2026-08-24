@@ -1,0 +1,73 @@
+---
+- name: Ensure AAP setup base directory exists
+  ansible.builtin.file:
+    path: "{{ aap_setup_dest }}"
+    state: directory
+    mode: "0755"
+  become: false
+
+- name: Extract AAP 2.7 containerized setup bundle
+  ansible.builtin.unarchive:
+    src: "files/{{ aap_setup_tarball }}"
+    dest: "{{ aap_setup_dest }}"
+    remote_src: false
+    extra_opts: [--overwrite]
+    creates: "{{ aap_setup_install_dir }}/bundle"
+  become: false
+
+- name: Generate dynamic AAP inventory
+  ansible.builtin.template:
+    src: inventory.j2
+    dest: "{{ aap_setup_install_dir }}/inventory"
+    mode: "0644"
+  become: false
+
+- name: Check bundled collections directory
+  ansible.builtin.stat:
+    path: "{{ aap_setup_install_dir }}/bundle/collections"
+  register: aap_bundle_collections_dir
+
+- name: Find bundled Ansible collections
+  ansible.builtin.find:
+    paths: "{{ aap_setup_install_dir }}/bundle/collections"
+    patterns: "*.tar.gz"
+  register: aap_bundled_collections
+  when: aap_bundle_collections_dir.stat.exists
+
+- name: Install bundled Ansible collections
+  ansible.builtin.command:
+    argv:
+      - ansible-galaxy
+      - collection
+      - install
+      - "{{ item.path }}"
+      - -p
+      - "{{ aap_collections_path }}"
+  loop: "{{ aap_bundled_collections.files | default([]) }}"
+  loop_control:
+    label: "{{ item.path | basename }}"
+  when: aap_bundled_collections.files | default([]) | length > 0
+  changed_when: true
+
+- name: Installing AAP 2.7 (containerized)
+  ansible.builtin.command:
+    argv:
+      - ansible-playbook
+      - -i
+      - inventory
+      - ansible.containerized_installer.install
+    chdir: "{{ aap_setup_install_dir }}"
+  environment:
+    PYTHONUNBUFFERED: "1"
+    ANSIBLE_FORCE_COLOR: "True"
+    ANSIBLE_COLLECTIONS_PATH: "{{ aap_setup_install_dir }}:{{ aap_setup_install_dir }}/bundle/collections:{{ aap_collections_path }}:/usr/share/ansible/collections"
+  async: "{{ aap_install_async_timeout }}"
+  poll: 0
+  become: false
+
+- name: Monitor the installation process
+  ansible.builtin.debug:
+    msg: >-
+      AAP 2.7 installation started in background.
+      Monitor with: journalctl -f or check ansible-playbook job output.
+      Gateway URL after completion: https://{{ vms_all.aap | selectattr('role', 'equalto', 'automationgateway') | map(attribute='name') | first }}.{{ domain }}:443

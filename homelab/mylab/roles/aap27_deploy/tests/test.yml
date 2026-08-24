@@ -3,4 +3,4 @@
 - hosts: localhost
   remote_user: root
   roles:
-    - aap25_deploy
+    - aap27_deploy

@@ -43,10 +43,9 @@
         username: "{{ registry_user }}"
         password: "{{ registry_pass }}"
 
-    - name: Enable repositories required by AAP 2.5 Installation
+    - name: Enable RHEL repositories required for containerized AAP dependencies
       community.general.rhsm_repository:
         name:
-          - ansible-automation-platform-2.5-for-rhel-9-x86_64-rpms
           - rhel-9-for-x86_64-appstream-rpms
           - rhel-9-for-x86_64-baseos-rpms
         state: enabled

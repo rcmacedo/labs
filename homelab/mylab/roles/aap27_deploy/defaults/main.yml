@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: MIT-0
+---
+aap_setup_tarball: "ansible-automation-platform-containerized-setup-bundle-2.7-4-x86_64.tar.gz"
+aap_setup_dest: "{{ ansible_env.HOME }}/aap"
+aap_setup_install_dir: "{{ aap_setup_dest }}/ansible-automation-platform-containerized-setup-bundle-2.7-4"
+aap_collections_path: "{{ ansible_env.HOME }}/.ansible/collections"
+aap_install_async_timeout: 7200

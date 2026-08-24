@@ -1,0 +1,60 @@
+# Ansible Automation Platform 2.7 - Enterprise topology (disconnected bundle)
+# Generated dynamically from vms_all.aap
+
+{% set groups = vms_all.aap | map(attribute='role') | unique | list %}
+
+{% for group in groups %}
+[{{ group }}]
+{% for h in vms_all.aap if h.role == group %}
+{{ h.name }}.{{ domain }}
+{% endfor %}
+
+{% if group == "automationcontroller" %}
+[automationcontroller:vars]
+peers=execution_nodes
+
+{% endif %}
+{% endfor %}
+[all:vars]
+ansible_user=root
+ansible_ssh_private_key_file=/home/{{ ansible_user_id | default(ansible_env.USER) }}/.ssh/id_rsa
+ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+
+# Disconnected (bundled) installation
+bundle_install=true
+bundle_dir={{ aap_setup_install_dir }}/bundle
+
+# Database
+postgresql_admin_username={{ postgresql_admin_username }}
+postgresql_admin_password={{ aap_password }}
+
+redis_mode=standalone
+
+{% set db_host = vms_all.aap | selectattr('role', 'equalto', 'database') | first %}
+
+# Platform gateway
+gateway_admin_password={{ aap_password }}
+gateway_pg_host={{ db_host.name }}.{{ domain }}
+gateway_pg_password={{ aap_password }}
+
+# Automation controller
+controller_admin_password={{ aap_password }}
+controller_pg_host={{ db_host.name }}.{{ domain }}
+controller_pg_password={{ aap_password }}
+
+# Automation hub
+hub_admin_password={{ aap_password }}
+hub_pg_host={{ db_host.name }}.{{ domain }}
+hub_pg_password={{ aap_password }}
+hub_seed_collections=false
+
+# Event-Driven Ansible controller
+eda_admin_password={{ aap_password }}
+eda_pg_host={{ db_host.name }}.{{ domain }}
+eda_pg_password={{ aap_password }}
+
+# Metrics service (required in AAP 2.7 when automationcontroller is present)
+automationmetrics_pg_host={{ db_host.name }}.{{ domain }}
+automationmetrics_pg_password={{ aap_password }}
+automationmetrics_controller_read_pg_host={{ db_host.name }}.{{ domain }}
+automationmetrics_controller_read_pg_password={{ aap_password }}

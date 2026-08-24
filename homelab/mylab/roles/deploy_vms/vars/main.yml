@@ -19,9 +19,17 @@ network_gateway: "192.168.124.1"
 network_name: external
 
 # AAP password
-aap_pasword: redhat
-registry_user: 
-registry_pass: 
+aap_password: redhat
+
+# AAP 2.7 disconnected bundle
+aap_setup_tarball: "ansible-automation-platform-containerized-setup-bundle-2.7-4-x86_64.tar.gz"
+aap_setup_dest: "{{ ansible_env.HOME }}/aap"
+aap_setup_install_dir: "{{ aap_setup_dest }}/ansible-automation-platform-containerized-setup-bundle-2.7-4"
+postgresql_admin_username: postgres
+
+# Registry variables (RHSM subscription on VMs; not used in AAP inventory)
+registry_user: rcmacedo
+registry_pass: 01gh@Red01
 
 vms_all:
   aap:
@@ -58,7 +66,7 @@ vms_all:
         - { size: 20, suffix: root }
 
     - name: "aapeda"
-      role: "automationedacontroller"
+      role: "automationeda"
       ip: "192.168.124.105"
       vcpu: 2
       mem: 8192
@@ -72,6 +80,14 @@ vms_all:
       mem: 8192
       disks:
         - { size: 20, suffix: root }
+
+    - name: "aapmetrics"
+      role: "automationmetrics"
+      ip: "192.168.124.107"
+      vcpu: 2
+      mem: 8192
+      disks:
+        - { size: 40, suffix: root }
   ocp:
     - { name: "master1", ip: "192.168.124.201", vcpu: 2, mem: 8192, disk_size: 20 }
     - { name: "master2", ip: "192.168.124.202", vcpu: 2, mem: 8192, disk_size: 20 }

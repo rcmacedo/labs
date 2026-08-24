@@ -1,0 +1,5 @@
+# AAP setup bundles — download from Red Hat Customer Portal
+homelab/mylab/roles/aap27_deploy/files/*.tar.gz
+
+# Built Ansible collection artifacts
+**/homelab-mylab-*.tar.gz
