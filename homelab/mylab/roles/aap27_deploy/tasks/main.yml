@@ -31,6 +31,7 @@
   ansible.builtin.find:
     paths: "{{ aap_setup_install_dir }}/bundle/collections"
     patterns: "*.tar.gz"
+    recurse: true
   register: aap_bundled_collections
   when: aap_bundle_collections_dir.stat.exists
 
