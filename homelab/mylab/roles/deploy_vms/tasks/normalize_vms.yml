@@ -1,0 +1,23 @@
+---
+- name: Initialize normalized VM list
+  ansible.builtin.set_fact:
+    deploy_vms_list: []
+
+- name: Normalize VM disk configuration
+  ansible.builtin.set_fact:
+    deploy_vms_list: "{{ deploy_vms_list + [normalized_vm] }}"
+  loop: "{{ vms }}"
+  loop_control:
+    loop_var: vm
+    label: "{{ vm.name }}"
+  vars:
+    normalized_vm: >-
+      {{
+        vm if vm.disks is defined else
+        vm | combine({
+          'disks': [{
+            'suffix': vm_root_disk_suffix,
+            'size': vm.disk_size | default(vm_default_root_disk_size)
+          }]
+        }, recursive=True)
+      }}

@@ -1,3 +1,8 @@
 # SPDX-License-Identifier: MIT-0
 ---
-# defaults file for deploy_vms
+# Root partition inside the RHEL 9 KVM guest image (virt-filesystems -a <base.qcow2>)
+vm_root_partition: /dev/sda4
+
+# Default suffix and size when a VM entry omits the disks list
+vm_root_disk_suffix: root
+vm_default_root_disk_size: 60

@@ -37,23 +37,25 @@ postgresql_admin_username: postgres
 registry_user: rcmacedo
 registry_pass: 01gh@Red01
 
+# VM sizing: set per-VM disks[].size (GiB). OCP entries may use disk_size instead.
+# The deploy_vms role uses virt-resize to expand {{ vm_root_partition }} inside the guest.
 vms_all:
   aap:
     - name: "aapgateway"
       role: "automationgateway"
       ip: "192.168.124.101"
       vcpu: 2
-      mem: 8192
+      mem: 10240
       disks:
-        - { size: 20, suffix: root }
+        - { size: 60, suffix: root }
 
     - name: "aapcontroller"
       role: "automationcontroller"
       ip: "192.168.124.102"
       vcpu: 2
-      mem: 8192
+      mem: 10240
       disks:
-        - { size: 20, suffix: root }
+        - { size: 60, suffix: root }
 
     - name: "aapexec"
       role: "execution_nodes"
@@ -61,15 +63,15 @@ vms_all:
       vcpu: 2
       mem: 8192
       disks:
-        - { size: 20, suffix: root }
+        - { size: 60, suffix: root }
 
     - name: "aapdb"
       role: "database"
       ip: "192.168.124.104"
       vcpu: 2
-      mem: 8192
+      mem: 10240
       disks:
-        - { size: 20, suffix: root }
+        - { size: 60, suffix: root }
 
     - name: "aapeda"
       role: "automationeda"
@@ -77,7 +79,7 @@ vms_all:
       vcpu: 2
       mem: 8192
       disks:
-        - { size: 20, suffix: root }
+        - { size: 60, suffix: root }
 
     - name: "aaphub"
       role: "automationhub"
@@ -85,15 +87,15 @@ vms_all:
       vcpu: 2
       mem: 8192
       disks:
-        - { size: 20, suffix: root }
+        - { size: 60, suffix: root }
 
     - name: "aapmetrics"
       role: "automationmetrics"
       ip: "192.168.124.107"
       vcpu: 2
-      mem: 8192
+      mem: 4096
       disks:
-        - { size: 40, suffix: root }
+        - { size: 30, suffix: root }
   ocp:
     - { name: "master1", ip: "192.168.124.201", vcpu: 2, mem: 8192, disk_size: 20 }
     - { name: "master2", ip: "192.168.124.202", vcpu: 2, mem: 8192, disk_size: 20 }

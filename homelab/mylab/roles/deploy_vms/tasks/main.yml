@@ -1,15 +1,148 @@
 ---
+- name: Normalize VM disk configuration
+  ansible.builtin.import_tasks: normalize_vms.yml
+
+- name: Check whether VM exists in libvirt before disk operations
+  ansible.builtin.command:
+    argv:
+      - virsh
+      - dominfo
+      - "{{ item.name }}"
+  loop: "{{ deploy_vms_list }}"
+  loop_control:
+    label: "{{ item.name }}"
+  register: deploy_vms_libvirt_dominfo
+  changed_when: false
+  failed_when: false
+  become: true
+
+- name: Shut down running VMs before offline disk operations
+  ansible.builtin.command:
+    argv:
+      - virsh
+      - destroy
+      - "{{ item.item.name }}"
+  loop: "{{ deploy_vms_libvirt_dominfo.results }}"
+  loop_control:
+    label: "{{ item.item.name }}"
+  when: item.rc == 0
+  failed_when: false
+  changed_when: item.rc == 0
+  become: true
+
 - name: Create VM disks if they don't exist
-  ansible.builtin.command: >
-    qemu-img create -f qcow2
-    -b {{ rhel9_image }}
-    -F qcow2
-    {{ vm_storage_path }}/{{ item.0.name }}-{{ item.1.suffix }}.qcow2
-    {{ item.1.size }}G
-  loop: "{{ vms|subelements('disks') }}"
-  args:
+  ansible.builtin.command:
+    argv:
+      - qemu-img
+      - create
+      - -f
+      - qcow2
+      - -b
+      - "{{ rhel9_image }}"
+      - -F
+      - qcow2
+      - "{{ vm_storage_path }}/{{ item.0.name }}-{{ item.1.suffix }}.qcow2"
+      - "{{ item.1.size }}G"
     creates: "{{ vm_storage_path }}/{{ item.0.name }}-{{ item.1.suffix }}.qcow2"
-  become: yes
+  loop: "{{ deploy_vms_list | subelements('disks') }}"
+  loop_control:
+    label: "{{ item.0.name }}-{{ item.1.suffix }}"
+  become: true
+
+- name: Query VM disk virtual sizes
+  ansible.builtin.command:
+    argv:
+      - qemu-img
+      - info
+      - --output=json
+      - "{{ vm_storage_path }}/{{ item.0.name }}-{{ item.1.suffix }}.qcow2"
+  loop: "{{ deploy_vms_list | subelements('disks') }}"
+  loop_control:
+    label: "{{ item.0.name }}-{{ item.1.suffix }}"
+    extended: true
+  register: deploy_vms_disk_info
+  changed_when: false
+  become: true
+
+- name: Grow VM disk images when configured size increased
+  ansible.builtin.command:
+    argv:
+      - qemu-img
+      - resize
+      - "{{ vm_storage_path }}/{{ item.0.name }}-{{ item.1.suffix }}.qcow2"
+      - "{{ item.1.size }}G"
+  loop: "{{ deploy_vms_list | subelements('disks') }}"
+  loop_control:
+    label: "{{ item.0.name }}-{{ item.1.suffix }}"
+    extended: true
+  when: >-
+    (deploy_vms_disk_info.results[ansible_loop.index0].stdout | from_json)['virtual-size'] <
+    (item.1.size | int * 1073741824)
+  become: true
+
+- name: Remove stale expanded disk image temporary files
+  ansible.builtin.file:
+    path: "{{ deploy_vms_root_disk_path }}.expanded"
+    state: absent
+  loop: "{{ deploy_vms_list }}"
+  loop_control:
+    label: "{{ item.name }}"
+  vars:
+    deploy_vms_root_disk_path: "{{ vm_storage_path }}/{{ item.name }}-{{ vm_root_disk_suffix }}.qcow2"
+  become: true
+
+- name: Create temporary disk image for partition expansion
+  ansible.builtin.command:
+    argv:
+      - qemu-img
+      - create
+      - -f
+      - qcow2
+      - "{{ deploy_vms_root_disk_path }}.expanded"
+      - "{{ deploy_vms_root_disk_size_gb }}G"
+  loop: "{{ deploy_vms_list }}"
+  loop_control:
+    label: "{{ item.name }}"
+  vars:
+    deploy_vms_root_disk_path: "{{ vm_storage_path }}/{{ item.name }}-{{ vm_root_disk_suffix }}.qcow2"
+    deploy_vms_root_disk_size_gb: "{{ item.disks | selectattr('suffix', 'equalto', vm_root_disk_suffix) | map(attribute='size') | first }}"
+  become: true
+
+- name: Expand root partition to fill VM disk image
+  ansible.builtin.command:
+    argv:
+      - virt-resize
+      - --expand
+      - "{{ vm_root_partition }}"
+      - -f
+      - qcow2
+      - --output-format
+      - qcow2
+      - "{{ deploy_vms_root_disk_path }}"
+      - "{{ deploy_vms_root_disk_path }}.expanded"
+  loop: "{{ deploy_vms_list }}"
+  loop_control:
+    label: "{{ item.name }}"
+  vars:
+    deploy_vms_root_disk_path: "{{ vm_storage_path }}/{{ item.name }}-{{ vm_root_disk_suffix }}.qcow2"
+  register: deploy_vms_virt_resize
+  become: true
+
+- name: Replace VM disk image with expanded copy
+  ansible.builtin.command:
+    argv:
+      - mv
+      - -f
+      - "{{ deploy_vms_root_disk_path }}.expanded"
+      - "{{ deploy_vms_root_disk_path }}"
+  loop: "{{ deploy_vms_list }}"
+  loop_control:
+    label: "{{ item.name }}"
+    extended: true
+  vars:
+    deploy_vms_root_disk_path: "{{ vm_storage_path }}/{{ item.name }}-{{ vm_root_disk_suffix }}.qcow2"
+  when: deploy_vms_virt_resize.results[ansible_loop.index0].rc == 0
+  become: true
 
 - name: Generate SSH key pair for {{ ansible_user_id }} user on localhost
   community.crypto.openssh_keypair:
@@ -17,55 +150,85 @@
     type: rsa
     size: 4096
     state: present
-    force: no
-  become: no
+    force: false
+  become: false
 
 - name: Copy SSH key pair
   ansible.builtin.copy:
     src: ~/.ssh/id_rsa.pub
     dest: /tmp/id_rsa.pub
-    force: yes
+    mode: "0644"
+    force: true
 
 - name: Render interface config for each VM
   ansible.builtin.template:
     src: ifcfg-eth0.j2
     dest: "/tmp/ifcfg-{{ item.name }}"
-  loop: "{{ vms }}"
+    mode: "0644"
+  loop: "{{ deploy_vms_list }}"
 
 - name: Render hosts file for all VMs
   ansible.builtin.template:
     src: hosts.j2
-    dest: "/tmp/hosts"
+    dest: /tmp/hosts
+    mode: "0644"
 
-- name: Customize VM images (root password, hostname, network, sshkey configs etc... )
-  ansible.builtin.command: >
-    virt-customize -a {{ vm_storage_path }}/{{ item.name }}-root.qcow2
-    --root-password password:{{ root_password }}
-    --hostname {{ item.name }}.{{ domain }}
-    --ssh-inject root:file:/tmp/id_rsa.pub
-    --upload /tmp/ifcfg-{{ item.name }}:/etc/sysconfig/network-scripts/ifcfg-eth0
-    --upload /tmp/hosts:/etc/hosts
-    --run-command "sed -i 's/^#*PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config"
-    --run-command "sed -i 's/^#*PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config"
-    --run-command "systemctl enable sshd"
-  loop: "{{ vms }}"
-  become: yes
+- name: Customize VM images (root password, hostname, network, sshkey configs etc...)
+  ansible.builtin.command:
+    argv:
+      - virt-customize
+      - -a
+      - "{{ vm_storage_path }}/{{ item.name }}-{{ vm_root_disk_suffix }}.qcow2"
+      - --root-password
+      - "password:{{ root_password }}"
+      - --hostname
+      - "{{ item.name }}.{{ domain }}"
+      - --ssh-inject
+      - "root:file:/tmp/id_rsa.pub"
+      - --upload
+      - "/tmp/ifcfg-{{ item.name }}:/etc/sysconfig/network-scripts/ifcfg-eth0"
+      - --upload
+      - "/tmp/hosts:/etc/hosts"
+      - --run-command
+      - sed -i 's/^#*PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+      - --run-command
+      - sed -i 's/^#*PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+      - --run-command
+      - systemctl enable sshd
+  loop: "{{ deploy_vms_list }}"
+  loop_control:
+    label: "{{ item.name }}"
+  become: true
 
 - name: Create VM using virt-install if it does not exist
   ansible.builtin.command: >
     virt-install
-    --name {{ item.name }}
-    --ram {{ item.mem }}
-    --vcpus {{ item.vcpu }}
-    {% for disk in item.disks %}
-      --disk path={{ vm_storage_path }}/{{ item.name }}-{{ disk.suffix }}.qcow2,format=qcow2
+    --name {{ item.item.name }}
+    --ram {{ item.item.mem }}
+    --vcpus {{ item.item.vcpu }}
+    {% for disk in item.item.disks %}
+      --disk path={{ vm_storage_path }}/{{ item.item.name }}-{{ disk.suffix }}.qcow2,format=qcow2
     {% endfor %}
     --os-variant rhel9.0
     --network network={{ network_name }},model=virtio
     --graphics vnc
     --import
     --noautoconsole
-  loop: "{{ vms }}"
+  loop: "{{ deploy_vms_libvirt_dominfo.results }}"
   loop_control:
-    loop_var: item
-  become: yes
+    label: "{{ item.item.name }}"
+  when: item.rc != 0
+  become: true
+
+- name: Start existing VMs after disk operations
+  ansible.builtin.command:
+    argv:
+      - virsh
+      - start
+      - "{{ item.item.name }}"
+  loop: "{{ deploy_vms_libvirt_dominfo.results }}"
+  loop_control:
+    label: "{{ item.item.name }}"
+  when: item.rc == 0
+  changed_when: item.rc == 0
+  become: true

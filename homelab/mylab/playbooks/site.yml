@@ -18,4 +18,3 @@
 - ansible.builtin.import_playbook: ocp4.yml
   tags:
     - ocp4
-
