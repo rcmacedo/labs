@@ -3,5 +3,6 @@
 aap_setup_tarball: "ansible-automation-platform-containerized-setup-bundle-2.7-4-x86_64.tar.gz"
 aap_setup_dest: "{{ ansible_env.HOME }}/aap"
 aap_setup_install_dir: "{{ aap_setup_dest }}/{{ aap_setup_tarball | regex_replace('\\.tar\\.gz$', '') }}"
-aap_collections_path: "{{ ansible_env.HOME }}/.ansible/collections"
+aap_installer_venv: "{{ aap_setup_dest }}/installer-venv"
+aap_ansible_core_spec: "ansible-core>=2.14,<2.15"
 aap_install_async_timeout: 7200
