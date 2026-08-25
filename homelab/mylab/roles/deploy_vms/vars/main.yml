@@ -21,6 +21,12 @@ network_name: external
 # AAP password
 aap_password: redhat
 
+# AAP containerized installer remote user (non-root, requires sudo; SSH key auth)
+aap_install_user: aap
+
+# Homelab: skip AAP installer 16GB RAM preflight (VMs use 8GB each)
+aap_lab_skip_ram_check: true
+
 # AAP 2.7 disconnected bundle
 aap_setup_tarball: "ansible-automation-platform-containerized-setup-bundle-2.7-4-x86_64.tar.gz"
 aap_setup_dest: "{{ ansible_env.HOME }}/aap"

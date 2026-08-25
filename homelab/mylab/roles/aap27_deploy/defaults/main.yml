@@ -3,4 +3,15 @@
 aap_setup_tarball: "ansible-automation-platform-containerized-setup-bundle-2.7-4-x86_64.tar.gz"
 aap_setup_dest: "{{ ansible_env.HOME }}/aap"
 aap_setup_install_dir: "{{ aap_setup_dest }}/{{ aap_setup_tarball | regex_replace('\\.tar\\.gz$', '') }}"
+aap_use_installer_venv: true
+aap_installer_venv: "{{ aap_setup_dest }}/installer-venv"
+# Python 3.14+ requires ansible-core 2.16+ (2.14 fails ast conditionals on the control node).
+# AAP installer accepts ansible-core 2.14 (RHEL 9) or 2.16 (RHEL 10).
+aap_ansible_core_spec: "{{ 'ansible-core>=2.16,<2.17' if ansible_python_version is version('3.13', '>') else 'ansible-core>=2.14,<2.15' }}"
 aap_install_async_timeout: 7200
+
+# Lab only: disable the 16GB RAM assert in the AAP installer preflight (nodes.yml).
+# VMs still run with their configured memory; install may fail or be unstable under load.
+aap_lab_skip_ram_check: false
+aap_preflight_nodes_yml: >-
+  {{ aap_setup_install_dir }}/collections/ansible_collections/ansible/containerized_installer/roles/preflight/tasks/nodes.yml

@@ -4,6 +4,11 @@
   tags:
     - deployvms
 
+# Destroy VMs and disks
+- ansible.builtin.import_playbook: destroyvms.yml
+  tags:
+    - destroyvms
+
 # AAP 2.7 deployment
 - ansible.builtin.import_playbook: aap27.yml
   tags:

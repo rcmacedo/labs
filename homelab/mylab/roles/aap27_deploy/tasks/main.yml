@@ -6,6 +6,32 @@
     mode: "0755"
   become: false
 
+- name: Prepare isolated ansible-core for AAP installer
+  when: aap_use_installer_venv | bool
+  block:
+    - name: Ensure AAP installer Python virtual environment exists
+      ansible.builtin.command:
+        cmd: python3 -m venv {{ aap_installer_venv }}
+        creates: "{{ aap_installer_venv }}/bin/python"
+      become: false
+
+    - name: Install supported ansible-core version for AAP installer
+      ansible.builtin.pip:
+        name: "{{ aap_ansible_core_spec }}"
+        virtualenv: "{{ aap_installer_venv }}"
+        state: present
+        extra_args: --upgrade
+      become: false
+
+    - name: Set AAP installer ansible-playbook path from virtual environment
+      ansible.builtin.set_fact:
+        aap_installer_playbook: "{{ aap_installer_venv }}/bin/ansible-playbook"
+
+- name: Set AAP installer ansible-playbook path from system
+  ansible.builtin.set_fact:
+    aap_installer_playbook: ansible-playbook
+  when: not aap_use_installer_venv | bool
+
 - name: Extract AAP 2.7 containerized setup bundle
   ansible.builtin.unarchive:
     src: "files/{{ aap_setup_tarball }}"
@@ -15,6 +41,14 @@
     creates: "{{ aap_setup_install_dir }}/bundle"
   become: false
 
+- name: Add AAP lab hosts to installer /etc/hosts
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    line: "{{ item.ip }}\t{{ item.name }}.{{ domain }} {{ item.name }}"
+    state: present
+  loop: "{{ vms_all.aap }}"
+  become: true
+
 - name: Generate dynamic AAP inventory
   ansible.builtin.template:
     src: inventory.j2
@@ -22,10 +56,24 @@
     mode: "0644"
   become: false
 
+- name: Skip AAP installer RAM preflight check in lab environments
+  ansible.builtin.replace:
+    path: "{{ aap_preflight_nodes_yml }}"
+    regexp: "^  when: \\(receptor_type \\| default\\(''\\)\\) != 'hop' or group_names != \\['execution_nodes'\\]$"
+    replace: "  when: false  # disabled by homelab.mylab (aap_lab_skip_ram_check)"
+  when: aap_lab_skip_ram_check | bool
+
+- name: Warn that AAP RAM preflight check is disabled
+  ansible.builtin.debug:
+    msg: >-
+      aap_lab_skip_ram_check is enabled: the installer will not enforce 16GB RAM per node.
+      This is intended for homelab only; production installs should use supported sizing.
+  when: aap_lab_skip_ram_check | bool
+
 - name: Installing AAP 2.7 (containerized)
   ansible.builtin.command:
     argv:
-      - ansible-playbook
+      - "{{ aap_installer_playbook }}"
       - -i
       - inventory
       - ansible.containerized_installer.install

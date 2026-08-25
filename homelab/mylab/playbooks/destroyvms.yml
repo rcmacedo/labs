@@ -1,0 +1,15 @@
+---
+- name: Destroy lab VMs
+  hosts: localhost
+  gather_facts: false
+  become: true
+  vars:
+    vms: "{{ vms_all[target_env] }}"
+  vars_files:
+    - ../roles/deploy_vms/vars/main.yml
+
+  tasks:
+    - name: Destroy lab VMs and disks
+      ansible.builtin.import_role:
+        name: homelab.mylab.deploy_vms
+        tasks_from: destroy

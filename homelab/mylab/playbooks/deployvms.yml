@@ -27,6 +27,7 @@
   become: yes
   vars:
     ansible_python_interpreter: /usr/bin/python3.9
+    aap_ssh_public_key: "{{ lookup('ansible.builtin.file', lookup('ansible.builtin.env', 'HOME') + '/.ssh/id_rsa.pub') }}"
   vars_files:
     - ../roles/deploy_vms/vars/main.yml
 
@@ -49,5 +50,32 @@
           - rhel-9-for-x86_64-appstream-rpms
           - rhel-9-for-x86_64-baseos-rpms
         state: enabled
+      become: yes
+      when: target_env == 'aap'
+
+    - name: Create AAP installation user
+      ansible.builtin.user:
+        name: "{{ aap_install_user }}"
+        groups: wheel
+        append: true
+        create_home: true
+        state: present
+      become: yes
+      when: target_env == 'aap'
+
+    - name: Allow AAP installation user passwordless sudo
+      ansible.builtin.copy:
+        dest: "/etc/sudoers.d/{{ aap_install_user }}"
+        content: "{{ aap_install_user }} ALL=(ALL) NOPASSWD: ALL\n"
+        mode: "0440"
+        validate: /usr/sbin/visudo -cf %s
+      become: yes
+      when: target_env == 'aap'
+
+    - name: Add SSH public key for AAP installation user
+      ansible.builtin.authorized_key:
+        user: "{{ aap_install_user }}"
+        state: present
+        key: "{{ aap_ssh_public_key }}"
       become: yes
       when: target_env == 'aap'

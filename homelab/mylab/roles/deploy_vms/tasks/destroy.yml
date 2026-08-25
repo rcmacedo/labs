@@ -1,0 +1,72 @@
+---
+- name: Check whether VM exists in libvirt
+  ansible.builtin.command:
+    argv:
+      - virsh
+      - dominfo
+      - "{{ item.name }}"
+  loop: "{{ vms }}"
+  loop_control:
+    label: "{{ item.name }}"
+  register: deploy_vms_libvirt_dominfo
+  changed_when: false
+  failed_when: false
+  become: true
+
+- name: Destroy running VM
+  ansible.builtin.command:
+    argv:
+      - virsh
+      - destroy
+      - "{{ item.item.name }}"
+  loop: "{{ deploy_vms_libvirt_dominfo.results }}"
+  loop_control:
+    label: "{{ item.item.name }}"
+  when: item.rc == 0
+  failed_when: false
+  changed_when: item.rc == 0
+  become: true
+
+- name: Undefine VM from libvirt
+  ansible.builtin.command:
+    argv:
+      - virsh
+      - undefine
+      - "{{ item.item.name }}"
+      - --remove-all-storage
+  loop: "{{ deploy_vms_libvirt_dominfo.results }}"
+  loop_control:
+    label: "{{ item.item.name }}"
+  when: item.rc == 0
+  failed_when: false
+  changed_when: item.rc == 0
+  become: true
+
+- name: Remove VM disk files
+  ansible.builtin.file:
+    path: "{{ vm_storage_path }}/{{ item.0.name }}-{{ item.1.suffix }}.qcow2"
+    state: absent
+  loop: "{{ vms | subelements('disks', skip_missing=True) }}"
+  loop_control:
+    label: "{{ item.0.name }}-{{ item.1.suffix }}.qcow2"
+  become: true
+
+- name: Remove rendered VM configuration files from /tmp
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /tmp/hosts
+    - /tmp/id_rsa.pub
+  loop_control:
+    label: "{{ item }}"
+  become: true
+
+- name: Remove rendered network config files from /tmp
+  ansible.builtin.file:
+    path: "/tmp/ifcfg-{{ item.name }}"
+    state: absent
+  loop: "{{ vms }}"
+  loop_control:
+    label: "{{ item.name }}"
+  become: true

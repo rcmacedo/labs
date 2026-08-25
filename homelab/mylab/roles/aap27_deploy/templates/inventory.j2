@@ -6,7 +6,7 @@
 {% for group in groups %}
 [{{ group }}]
 {% for h in vms_all.aap if h.role == group %}
-{{ h.name }}.{{ domain }}
+{{ h.name }}.{{ domain }} ansible_host={{ h.ip }}
 {% endfor %}
 
 {% if group == "automationcontroller" %}
@@ -15,8 +15,13 @@ peers=execution_nodes
 
 {% endif %}
 {% endfor %}
+
+# Installer host (Fedora control node) — must be in a host group, not under [all:vars]
+[local]
+localhost ansible_connection=local ansible_user={{ ansible_user_id | default(ansible_env.USER) }} ansible_become=false
+
 [all:vars]
-ansible_user=root
+ansible_user={{ aap_install_user }}
 ansible_ssh_private_key_file=/home/{{ ansible_user_id | default(ansible_env.USER) }}/.ssh/id_rsa
 ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
 
