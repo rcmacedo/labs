@@ -3,3 +3,6 @@ homelab/mylab/roles/aap27_deploy/files/*.tar.gz
 
 # Built Ansible collection artifacts
 **/homelab-mylab-*.tar.gz
+
+# Local secrets (API keys, tokens)
+homelab/mylab/roles/deploy_vms/vars/secrets.yml

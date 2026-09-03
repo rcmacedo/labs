@@ -4,5 +4,15 @@
   gather_facts: true
   vars_files:
     - ../roles/deploy_vms/vars/main.yml
+  pre_tasks:
+    - name: Check for local secrets file
+      ansible.builtin.stat:
+        path: "{{ playbook_dir }}/../roles/deploy_vms/vars/secrets.yml"
+      register: aap27_deploy_secrets_stat
+
+    - name: Load local secrets for AAP install
+      ansible.builtin.include_vars:
+        file: "{{ playbook_dir }}/../roles/deploy_vms/vars/secrets.yml"
+      when: aap27_deploy_secrets_stat.stat.exists
   roles:
     - homelab.mylab.aap27_deploy

@@ -1,11 +1,19 @@
 # Ansible Automation Platform 2.7 - Enterprise topology (disconnected bundle)
 # Generated dynamically from vms_all.aap
+# Each VM may define installer group(s) via roles: [group, ...] or role: group
 
-{% set groups = vms_all.aap | map(attribute='role') | unique | list %}
+{% set ns = namespace(groups=[]) %}
+{% for h in vms_all.aap %}
+{%   for r in h.roles | default([h.role]) %}
+{%     if r not in ns.groups %}
+{%       set _ = ns.groups.append(r) %}
+{%     endif %}
+{%   endfor %}
+{% endfor %}
 
-{% for group in groups %}
+{% for group in ns.groups | sort %}
 [{{ group }}]
-{% for h in vms_all.aap if h.role == group %}
+{% for h in vms_all.aap if group in (h.roles | default([h.role])) %}
 {{ h.name }}.{{ domain }} ansible_host={{ h.ip }}
 {% endfor %}
 
@@ -35,7 +43,13 @@ postgresql_admin_password={{ aap_password }}
 
 redis_mode=standalone
 
-{% set db_host = vms_all.aap | selectattr('role', 'equalto', 'database') | first %}
+{% set ns_db = namespace(host=none) %}
+{% for h in vms_all.aap %}
+{%   if 'database' in (h.roles | default([h.role])) %}
+{%     set ns_db.host = h %}
+{%   endif %}
+{% endfor %}
+{% set db_host = ns_db.host %}
 
 # Platform gateway
 gateway_admin_password={{ aap_password }}
@@ -57,6 +71,32 @@ hub_seed_collections=false
 eda_admin_password={{ aap_password }}
 eda_pg_host={{ db_host.name }}.{{ domain }}
 eda_pg_password={{ aap_password }}
+
+# ==============================================================================
+# CONFIGURAÇÕES DO RED HAT ANSIBLE LIGHTSPEED
+# ==============================================================================
+
+# Configurações administrativas básicas do Lightspeed
+
+lightspeed_admin_user=admin
+lightspeed_admin_password={{ aap_password }}
+lightspeed_admin_email=admin@lab.example
+
+# Conexão do Lightspeed ao banco
+
+lightspeed_pg_host={{ db_host.name }}.{{ domain }}
+lightspeed_pg_password={{ aap_password }}
+lightspeed_pg_database=lightspeed
+
+# ==============================================================================
+# CONFIGURAÇÃO DO AUTOMATION INTELLIGENT ASSISTANT (CHATBOT)
+# ==============================================================================
+
+# Configuração exclusiva do Chatbot usando OpenAI (defina em vars/secrets.yml ou -e)
+lightspeed_chatbot_default_provider='openai'
+lightspeed_chatbot_model_url='https://api.openai.com/v1'
+lightspeed_chatbot_model_api_key='{{ lightspeed_chatbot_model_api_key }}'
+lightspeed_chatbot_model_id='{{ lightspeed_chatbot_model_id | default("gpt-4o-mini") }}'
 
 # Metrics service (required in AAP 2.7 when automationcontroller is present)
 automationmetrics_pg_host={{ db_host.name }}.{{ domain }}

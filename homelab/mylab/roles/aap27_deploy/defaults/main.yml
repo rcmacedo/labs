@@ -15,3 +15,7 @@ aap_install_async_timeout: 7200
 aap_lab_skip_ram_check: false
 aap_preflight_nodes_yml: >-
   {{ aap_setup_install_dir }}/collections/ansible_collections/ansible/containerized_installer/roles/preflight/tasks/nodes.yml
+
+# Ansible Lightspeed chatbot (OpenAI) — set via vars/secrets.yml (gitignored) or -e
+lightspeed_chatbot_model_id: gpt-4o-mini
+lightspeed_chatbot_model_api_key: ""
