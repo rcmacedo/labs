@@ -100,7 +100,7 @@ Edite `mylab/roles/deploy_vms/vars/main.yml`:
 | `rhel9_image` | Caminho absoluto da imagem RHEL 9 KVM |
 | `vm_storage_path` | Diretório dos discos qcow2 (padrão `/var/lib/libvirt/images`) |
 | `domain` | Domínio DNS das VMs (padrão `lab.example`) |
-| `network_name` | Nome da rede libvirt |
+| `network_name` | Nome da rede libvirt - ( padrão external ) |
 | `dns_server`, `network_gateway` | DNS e gateway da rede lab |
 | `registry_user`, `registry_pass` | Credenciais RHSM |
 | `aap_password` | Senha admin dos componentes AAP |
