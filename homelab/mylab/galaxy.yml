@@ -22,7 +22,9 @@ authors:
 
 ### OPTIONAL but strongly recommended
 # A short summary description of the collection
-description: Collection to provision VMs and deploy AAP in homelab
+description: >-
+  Provision KVM/libvirt lab VMs and deploy Ansible Automation Platform 2.7
+  (containerized, disconnected bundle) with Ansible Lightspeed Intelligent Assistant.
 
 # Either a single license or a list of licenses for content inside of a collection. Ansible Galaxy currently only
 # accepts L(SPDX,https://spdx.org/licenses/) licenses. This key is mutually exclusive with 'license_file'
@@ -41,7 +43,9 @@ tags: []
 # collection label 'namespace.name'. The value is a version range
 # L(specifiers,https://python-semanticversion.readthedocs.io/en/latest/#requirement-specification). Multiple version
 # range specifiers can be set and are separated by ','
-dependencies: {}
+dependencies:
+  community.general: ">=8.0.0"
+  community.crypto: ">=2.0.0"
 
 # The URL of the originating SCM repository
 repository: https://github.com/rcmacedo/labs
