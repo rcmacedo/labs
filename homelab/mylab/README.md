@@ -138,28 +138,14 @@ O tarball **não** é incluído no artefato da collection (arquivo grande). Copi
 mylab/roles/aap27_deploy/files/ansible-automation-platform-containerized-setup-bundle-2.7-4-x86_64.tar.gz
 ```
 
-Se instalar a collection a partir do `.tar.gz` gerado, copie o bundle também para o mesmo caminho dentro da collection instalada:
-
-```text
-~/.ansible/collections/ansible_collections/homelab/mylab/roles/aap27_deploy/files/
-```
-
 ### 6. Build e instalação da collection
 
-A partir de `labs/homelab/`:
+A partir de `labs/homelab/mylab`:
 
 ```bash
-ansible-galaxy collection build mylab -f
+ansible-galaxy collection build -f
 ansible-galaxy collection install homelab-mylab-1.0.0.tar.gz -f
 ```
-
-Alternativa para desenvolvimento (sem build, usa o diretório fonte):
-
-```bash
-ansible-galaxy collection install ./mylab --force
-```
-
-Após editar variáveis no fonte, reinstale ou edite os arquivos no caminho instalado em `~/.ansible/collections/ansible_collections/homelab/mylab/`.
 
 ### 7. Executar
 
@@ -168,36 +154,25 @@ Sempre informe o ambiente alvo: `-e target_env=aap`.
 **Somente VMs** (primeira vez ou redeploy):
 
 ```bash
-ansible-playbook homelab.mylab.site \
-  --tags deployvms \
-  -e target_env=aap \
-  --ask-become-pass
+ansible-playbook homelab.mylab.site --tags deployvms -e target_env=aap --ask-become-pass
 ```
 
 **Somente AAP 2.7** (VMs já existem):
 
 ```bash
-ansible-playbook homelab.mylab.site \
-  --tags aap27 \
-  -e target_env=aap
+ansible-playbook homelab.mylab.site --tags aap27 -e target_env=aap
 ```
 
 **Fluxo completo** (VMs + AAP):
 
 ```bash
-ansible-playbook homelab.mylab.site \
-  --tags deployvms,aap27 \
-  -e target_env=aap \
-  --ask-become-pass
+ansible-playbook homelab.mylab.site --tags deployvms,aap27 -e target_env=aap --ask-become-pass
 ```
 
 **Destruir VMs e discos**:
 
 ```bash
-ansible-playbook homelab.mylab.site \
-  --tags destroyvms \
-  -e target_env=aap \
-  --ask-become-pass
+ansible-playbook homelab.mylab.site --tags destroyvms -e target_env=aap --ask-become-pass
 ```
 
 ### 8. Acompanhar a instalação do AAP
